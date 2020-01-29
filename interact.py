@@ -154,6 +154,9 @@ def run_model():
         while not raw_text:
             print('Prompt should not be empty!')
             raw_text = input("USR >>> ")
+        if raw_text.lower() == 'quit':
+          print('SYS >>> Goodbye!')
+          break
         history.append(raw_text)
         context_tokens = sum([enc.encode(h) + [EOS_ID] for h in history],[]) #+ [EOS_ID]
         context_tokens = torch.tensor(context_tokens, device=device, dtype=torch.long).unsqueeze(0)
