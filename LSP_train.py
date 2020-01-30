@@ -216,7 +216,7 @@ optimizer_grouped_parameters = [
 if args.fp16:
     logger.info('in fp16, using FusedAdam')
     try:
-        from apex.optimizers import FP16_Optimizer
+        # from apex.optimizers import FP16_Optimizer
         from apex.optimizers import FusedAdam
     except ImportError:
         raise ImportError(
@@ -225,15 +225,14 @@ if args.fp16:
 
     optimizer = FusedAdam(optimizer_grouped_parameters,
                           lr=args.learning_rate,
-                          bias_correction=False,
-                          max_grad_norm=1.0)
-    if args.loss_scale == 0:
-        optimizer = FP16_Optimizer(optimizer, dynamic_loss_scale=True,
-                                   verbose=False)
-    else:
-        optimizer = FP16_Optimizer(optimizer,
-                                   static_loss_scale=args.loss_scale,
-                                   verbose=False)
+                          bias_correction=False)
+    # if args.loss_scale == 0:
+    #     optimizer = FP16_Optimizer(optimizer, dynamic_loss_scale=True,
+    #                                verbose=False)
+    # else:
+    #     optimizer = FP16_Optimizer(optimizer,
+    #                                static_loss_scale=args.loss_scale,
+    #                                verbose=False)
 else:
     optimizer = Adam(optimizer_grouped_parameters, args.learning_rate,
                      max_grad_norm=1.0)
@@ -284,10 +283,10 @@ while True:
             loss = loss.mean()
             ppl = ppl.mean()
         loss = loss / (args.train_batch_size / input_ids.shape[0])
-        if args.fp16:
-            optimizer.backward(loss)
-        else:
-            loss.backward()
+        # if args.fp16:
+        #     optimizer.backward(loss)
+        # else:
+        loss.backward()
 
         tr_loss += float(loss.item()) * (args.train_batch_size / input_ids.shape[0])
         nb_tr_examples += input_ids.size(0)
